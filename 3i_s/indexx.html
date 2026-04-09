@@ -1,0 +1,2689 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduAdmin - Student Information System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .sidebar-transition {
+            transition: transform 0.3s ease-in-out;
+        }
+
+
+        .medical-icon-btn {
+            transition: all 0.2s ease;
+        }
+
+        .medical-icon-btn.selected {
+            background-color: #ecfdf5;
+            border-color: #10b981;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .medical-icon-btn .indicator-dot {
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .medical-icon-btn.selected .indicator-dot {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+
+        .sub-nav-item {
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .sub-nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background-color: #34d399;
+            transition: height 0.2s ease;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .sub-nav-item.active::before {
+            height: 60%;
+        }
+
+        .sub-nav-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Toast Animation */
+        .toast-enter {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Modal Animation */
+        .modal-enter {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Tab styles */
+        .medical-tab {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .medical-tab.active {
+            color: #059669;
+            border-bottom: 2px solid #059669;
+        }
+
+        .medical-tab:hover:not(.active) {
+            color: #374151;
+            background-color: #f9fafb;
+        }
+
+        /* Visit log status badges */
+        .status-badge {
+            transition: all 0.2s ease;
+        }
+
+        .status-badge:hover {
+            transform: scale(1.05);
+        }
+
+        /* Timeline styles */
+        .timeline-line {
+            position: absolute;
+            left: 24px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e5e7eb;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 48px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 20px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #10b981;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #10b981;
+        }
+
+        /* Officer Card Styles */
+        .officer-card {
+            transition: all 0.3s ease;
+        }
+
+        .officer-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .officer-status {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        /* Clock Widget */
+        .digital-clock {
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.05em;
+        }
+
+        /* Searchable Dropdown Styles */
+        .searchable-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .searchable-dropdown-input {
+            width: 100%;
+            padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+        }
+
+        .searchable-dropdown-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .searchable-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 0.25rem;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 50;
+            display: none;
+        }
+
+        .searchable-dropdown-menu.show {
+            display: block;
+        }
+
+        .searchable-dropdown-search {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+
+        .searchable-dropdown-search input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+
+        .searchable-dropdown-search input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .searchable-dropdown-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .searchable-dropdown-item {
+            padding: 0.75rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.15s;
+        }
+
+        .searchable-dropdown-item:hover {
+            background-color: #eff6ff;
+        }
+
+        .searchable-dropdown-item.selected {
+            background-color: #dbeafe;
+            color: #1e40af;
+            font-weight: 500;
+        }
+
+        .searchable-dropdown-item.no-results {
+            color: #9ca3af;
+            cursor: default;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .searchable-dropdown-item.no-results:hover {
+            background-color: transparent;
+        }
+
+        .searchable-dropdown-clear {
+            position: absolute;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            cursor: pointer;
+            display: none;
+        }
+
+        .searchable-dropdown-clear.show {
+            display: block;
+        }
+
+        .searchable-dropdown-clear:hover {
+            color: #4b5563;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 h-screen overflow-hidden flex">
+
+    <!-- Mobile Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"
+        onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="fixed lg:static inset-y-0 left-0 z-30 w-64 bg-emerald-600 text-white transform -translate-x-full lg:translate-x-0 sidebar-transition flex flex-col shadow-xl">
+        <!-- Logo Area -->
+        <div class="h-20 flex items-center justify-center border-b border-emerald-500 bg-emerald-700">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-emerald-700 font-bold text-xl shadow-md overflow-hidden">
+                    <i class="fas fa-graduation-cap text-xl"></i>
+                </div>
+                <span class="text-xl font-bold tracking-wide">FEPC</span>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-2">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard"
+                class="nav-item w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-emerald-500 bg-emerald-500 shadow-md">
+                <i class="fas fa-home w-6 text-center"></i>
+                <span class="font-medium">Dashboard</span>
+            </button>
+
+            <button onclick="switchTab('students')" id="nav-students"
+                class="nav-item w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-emerald-500 text-emerald-100">
+                <i class="fas fa-users w-6 text-center"></i>
+                <span class="font-medium">Student List</span>
+            </button>
+
+            <!-- Separate Medical Records Navigation -->
+            <button onclick="switchTab('medical')" id="nav-medical"
+                class="nav-item w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-emerald-500 text-emerald-100">
+                <i class="fas fa-heartbeat w-6 text-center"></i>
+                <span class="font-medium">Medical Records</span>
+                <span id="medical-badge"
+                    class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 hidden">0</span>
+            </button>
+
+            <button onclick="switchTab('settings')" id="nav-settings"
+                class="nav-item w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-emerald-500 text-emerald-100">
+                <i class="fas fa-cog w-6 text-center"></i>
+                <span class="font-medium">Settings</span>
+            </button>
+        </nav>
+
+        <!-- User Profile Snippet -->
+        <div class="p-4 border-t border-emerald-500 bg-emerald-700">
+            <div class="flex items-center gap-3">
+                <img src="https://ui-avatars.com/api/?name=Admin+User&background=10b981&color=fff" alt="Admin"
+                    class="w-10 h-10 rounded-full border-2 border-emerald-400">
+                <div>
+                    <p class="text-sm font-semibold">Administrator</p>
+                    <p class="text-xs text-emerald-200">admin@edu.com</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+
+        <!-- Top Header -->
+        <header class="h-20 bg-white shadow-sm flex items-center justify-between px-6 z-10">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()"
+                    class="lg:hidden text-gray-500 hover:text-emerald-600 focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <h2 id="page-title" class="text-2xl font-bold text-gray-800">Dashboard</h2>
+            </div>
+            <div class="flex items-center gap-4">
+                <!-- Live Clock -->
+                <div class="hidden md:flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg">
+                    <i class="fas fa-clock text-emerald-600"></i>
+                    <span id="live-clock" class="digital-clock font-mono font-semibold text-gray-700">--:--:--</span>
+                    <span id="live-date" class="text-sm text-gray-500 ml-2">--/--/----</span>
+                </div>
+                <button class="p-2 text-gray-400 hover:text-emerald-600 transition-colors relative">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Scroll Area -->
+        <div class="flex-1 overflow-y-auto p-6 bg-gray-50 relative">
+
+            <!-- DASHBOARD VIEW -->
+            <div id="view-dashboard" class="view-section fade-in space-y-6">
+                <div
+                    class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-8 text-white shadow-lg flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">Welcome back, Admin!</h1>
+                        <p class="text-emerald-100 opacity-90">Here's what's happening with your students today.</p>
+                    </div>
+                    <i class="fas fa-chalkboard-teacher text-6xl text-emerald-200 opacity-50"></i>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div
+                        class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500 mb-1">Total Students</p>
+                                <h3 class="text-3xl font-bold text-gray-800" id="stat-total">0</h3>
+                            </div>
+                            <div class="p-3 bg-blue-50 rounded-lg text-blue-600">
+                                <i class="fas fa-user-graduate text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500 mb-1">With Medical Conditions</p>
+                                <h3 class="text-3xl font-bold text-red-600" id="stat-medical">0</h3>
+                            </div>
+                            <div class="p-3 bg-red-50 rounded-lg text-red-600">
+                                <i class="fas fa-heartbeat text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500 mb-1">Active Clinic Visits</p>
+                                <h3 class="text-3xl font-bold text-orange-600" id="stat-active-visits">0</h3>
+                            </div>
+                            <div class="p-3 bg-orange-50 rounded-lg text-orange-600">
+                                <i class="fas fa-clinic-medical text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500 mb-1">Today's Visits</p>
+                                <h3 class="text-3xl font-bold text-emerald-600" id="stat-today-visits">0</h3>
+                            </div>
+                            <div class="p-3 bg-emerald-50 rounded-lg text-emerald-600">
+                                <i class="fas fa-calendar-day text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Officer On Duty Widget -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Quick Actions</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <button onclick="switchTab('students'); openModal()"
+                                class="bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                <i class="fas fa-plus"></i> Add Student
+                            </button>
+                            <button onclick="switchTab('medical'); openMedicalLogModal()"
+                                class="bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                <i class="fas fa-plus"></i> Log Clinic Visit
+                            </button>
+                            <button onclick="switchTab('medical'); openMedicalStudentModal()"
+                                class="bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                <i class="fas fa-user-plus"></i> Register Medical Student
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl shadow-lg p-6 text-white">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-lg">Clinic Officer</h3>
+                            <i class="fas fa-user-md text-2xl opacity-50"></i>
+                        </div>
+                        <div id="dashboard-officer-info">
+                            <p class="text-2xl font-bold" id="dash-officer-name">Loading...</p>
+                            <p class="text-purple-100 text-sm" id="dash-officer-role">School Nurse</p>
+                            <div class="mt-4 flex items-center gap-2 text-sm bg-white/20 rounded-lg p-2">
+                                <div class="w-2 h-2 bg-green-400 rounded-full officer-status"></div>
+                                <span>On Duty since <span id="dash-duty-start">08:00 AM</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STUDENTS VIEW (Simplified - No Medical) -->
+            <div id="view-students" class="view-section hidden fade-in h-full flex flex-col">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col h-full">
+                    <!-- Toolbar with Filters -->
+                    <div class="p-6 border-b border-gray-100 space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div class="relative w-full sm:w-96">
+                                <i
+                                    class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" id="search-input" placeholder="Search students by name..."
+                                    class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                    onkeyup="applyFilters()">
+                            </div>
+                            <button onclick="openModal()"
+                                class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg shadow-md transition-all flex items-center justify-center gap-2">
+                                <i class="fas fa-plus"></i> Add New Student
+                            </button>
+                        </div>
+
+                        <div class="flex flex-wrap gap-3 items-center bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <span class="text-sm font-semibold text-gray-600 mr-2"><i class="fas fa-filter mr-1"></i>
+                                Filters:</span>
+
+                            <select id="filter-strand" onchange="applyFilters()"
+                                class="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                                <option value="">All Strands</option>
+                                <option value="ICT">ICT</option>
+                                <option value="HUMSS">HUMSS</option>
+                                <option value="ABM">ABM</option>
+                                <option value="IA">IA</option>
+                                <option value="HE">HE</option>
+                            </select>
+
+                            <select id="filter-grade" onchange="applyFilters()"
+                                class="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                                <option value="">All Grades</option>
+                                <option value="Grade 11">Grade 11</option>
+                                <option value="Grade 12">Grade 12</option>
+                            </select>
+
+                            <select id="filter-gender" onchange="applyFilters()"
+                                class="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                                <option value="">All Genders</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+
+                            <button onclick="resetFilters()"
+                                class="ml-auto text-sm text-red-500 hover:text-red-700 font-medium px-2">
+                                <i class="fas fa-undo mr-1"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-600 text-sm uppercase tracking-wider">
+                                    <th class="p-4 font-semibold border-b">Student ID</th>
+                                    <th class="p-4 font-semibold border-b">Name</th>
+                                    <th class="p-4 font-semibold border-b">Gender</th>
+                                    <th class="p-4 font-semibold border-b">Age</th>
+                                    <th class="p-4 font-semibold border-b">Grade Level</th>
+                                    <th class="p-4 font-semibold border-b">Strand</th>
+                                    <th class="p-4 font-semibold border-b text-center">Medical Status</th>
+                                    <th class="p-4 font-semibold border-b text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-table-body" class="text-gray-700 text-sm">
+                                <!-- Rows generated by JS -->
+                            </tbody>
+                        </table>
+
+                        <div id="empty-state" class="hidden flex-col items-center justify-center py-12 text-gray-400">
+                            <i class="fas fa-folder-open text-4xl mb-3"></i>
+                            <p>No students found matching your criteria.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MEDICAL RECORDS VIEW (Completely Separate) -->
+            <div id="view-medical" class="view-section hidden fade-in h-full flex flex-col space-y-6">
+
+                <!-- Clinic Status Bar -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-2xl shadow-lg">
+                                <i class="fas fa-clinic-medical"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800">School Clinic</h2>
+                                <p class="text-gray-500">Medical Records Management System</p>
+                            </div>
+                        </div>
+
+                        <!-- Officer Selector -->
+                        <div class="flex items-center gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <div class="text-right">
+                                <p class="text-xs text-gray-500 uppercase font-semibold">Medical Officer on Duty</p>
+                                <select id="current-officer-select" onchange="updateOfficer()"
+                                    class="mt-1 block w-48 border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm bg-white font-medium">
+                                    <!-- Populated dynamically -->
+                                </select>
+                                <p class="text-xs text-gray-400 mt-1" id="officer-duty-time">Since 08:00 AM | March 9,
+                                    2026</p>
+                            </div>
+                            <div
+                                class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                                <i class="fas fa-user-md text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medical Tab Navigation -->
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div class="flex border-b border-gray-200">
+                        <button onclick="switchMedicalTab('patients')" id="tab-patients"
+                            class="medical-tab active flex-1 py-4 px-6 text-sm font-semibold text-gray-600 hover:text-emerald-600 focus:outline-none transition-colors flex items-center justify-center gap-2">
+                            <i class="fas fa-users-medical"></i> Medical Patients
+                        </button>
+                        <button onclick="switchMedicalTab('visits')" id="tab-visits"
+                            class="medical-tab flex-1 py-4 px-6 text-sm font-semibold text-gray-600 hover:text-emerald-600 focus:outline-none transition-colors flex items-center justify-center gap-2">
+                            <i class="fas fa-clipboard-list"></i> Visit Log
+                            <span id="visit-count-badge"
+                                class="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-0.5 hidden">0</span>
+                        </button>
+                        <button onclick="switchMedicalTab('officers')" id="tab-officers"
+                            class="medical-tab flex-1 py-4 px-6 text-sm font-semibold text-gray-600 hover:text-emerald-600 focus:outline-none transition-colors flex items-center justify-center gap-2">
+                            <i class="fas fa-user-md"></i> Officer Log
+                        </button>
+                    </div>
+
+                    <!-- PATIENTS TAB -->
+                    <div id="medical-tab-patients" class="medical-tab-content p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">Medical Patients Registry</h3>
+                                <p class="text-sm text-gray-500">Students with registered medical conditions</p>
+                            </div>
+                            <button onclick="openMedicalStudentModal()"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition-all flex items-center gap-2">
+                                <i class="fas fa-user-plus"></i> Register New Medical Student
+                            </button>
+                        </div>
+
+                        <!-- Medical Stats -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-red-50 border border-red-100 p-4 rounded-lg">
+                                <p class="text-xs font-medium text-red-600 uppercase">Total Patients</p>
+                                <h3 class="text-2xl font-bold text-red-700" id="medical-patient-count">0</h3>
+                            </div>
+                            <div class="bg-orange-50 border border-orange-100 p-4 rounded-lg">
+                                <p class="text-xs font-medium text-orange-600 uppercase">Critical Cases</p>
+                                <h3 class="text-2xl font-bold text-orange-700" id="medical-critical-count">0</h3>
+                            </div>
+                            <div class="bg-blue-50 border border-blue-100 p-4 rounded-lg">
+                                <p class="text-xs font-medium text-blue-600 uppercase">Today's Visits</p>
+                                <h3 class="text-2xl font-bold text-blue-700" id="medical-today-visits">0</h3>
+                            </div>
+                            <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-lg">
+                                <p class="text-xs font-medium text-emerald-600 uppercase">Active in Clinic</p>
+                                <h3 class="text-2xl font-bold text-emerald-700" id="medical-active-count">0</h3>
+                            </div>
+                        </div>
+
+                        <!-- Filters -->
+                        <div
+                            class="flex flex-wrap gap-3 items-center bg-gray-50 p-3 rounded-lg border border-gray-200 mb-4">
+                            <span class="text-sm font-semibold text-gray-600">Filter by Condition:</span>
+                            <button onclick="filterMedicalPatients('all')"
+                                class="medical-filter-btn px-3 py-1 text-sm rounded-full bg-emerald-600 text-white transition-all"
+                                data-condition="all">All</button>
+                            <button onclick="filterMedicalPatients('Heart')"
+                                class="medical-filter-btn px-3 py-1 text-sm rounded-full bg-white border border-gray-300 text-gray-600 hover:bg-red-50 hover:text-red-600 transition-all"
+                                data-condition="Heart">❤️ Heart</button>
+                            <button onclick="filterMedicalPatients('Eyesight')"
+                                class="medical-filter-btn px-3 py-1 text-sm rounded-full bg-white border border-gray-300 text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-all"
+                                data-condition="Eyesight">👁️ Eyesight</button>
+                            <button onclick="filterMedicalPatients('Bone/Muscle')"
+                                class="medical-filter-btn px-3 py-1 text-sm rounded-full bg-white border border-gray-300 text-gray-600 hover:bg-yellow-50 hover:text-yellow-600 transition-all"
+                                data-condition="Bone/Muscle">🦴 Bone</button>
+                            <button onclick="filterMedicalPatients('Organ')"
+                                class="medical-filter-btn px-3 py-1 text-sm rounded-full bg-white border border-gray-300 text-gray-600 hover:bg-purple-50 hover:text-purple-600 transition-all"
+                                data-condition="Organ">🫁 Organ</button>
+                        </div>
+
+                        <!-- Medical Patients Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 text-gray-600 text-sm uppercase tracking-wider">
+                                        <th class="p-4 font-semibold border-b">Patient ID</th>
+                                        <th class="p-4 font-semibold border-b">Student Name</th>
+                                        <th class="p-4 font-semibold border-b">Conditions</th>
+                                        <th class="p-4 font-semibold border-b">Severity</th>
+                                        <th class="p-4 font-semibold border-b">Registered</th>
+                                        <th class="p-4 font-semibold border-b text-center">Status</th>
+                                        <th class="p-4 font-semibold border-b text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="medical-patients-table" class="text-gray-700 text-sm">
+                                    <!-- Generated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- VISITS TAB -->
+                    <div id="medical-tab-visits" class="medical-tab-content hidden p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">Clinic Visit Log</h3>
+                                <p class="text-sm text-gray-500">Track student visits with time in/out records</p>
+                            </div>
+                            <button onclick="openMedicalLogModal()"
+                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-md transition-all flex items-center gap-2">
+                                <i class="fas fa-plus"></i> New Visit Entry
+                            </button>
+                        </div>
+
+                        <!-- Visit Stats -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-xs font-medium text-gray-500 uppercase">Today's Visits</p>
+                                        <h3 class="text-2xl font-bold text-blue-600" id="visit-stat-today">0</h3>
+                                    </div>
+                                    <div class="p-3 bg-blue-50 rounded-lg text-blue-600">
+                                        <i class="fas fa-calendar-day text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-xs font-medium text-gray-500 uppercase">Currently In</p>
+                                        <h3 class="text-2xl font-bold text-orange-600" id="visit-stat-active">0</h3>
+                                    </div>
+                                    <div class="p-3 bg-orange-50 rounded-lg text-orange-600">
+                                        <i class="fas fa-clock text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-xs font-medium text-gray-500 uppercase">This Week</p>
+                                        <h3 class="text-2xl font-bold text-emerald-600" id="visit-stat-week">0</h3>
+                                    </div>
+                                    <div class="p-3 bg-emerald-50 rounded-lg text-emerald-600">
+                                        <i class="fas fa-calendar-week text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-xs font-medium text-gray-500 uppercase">Avg Duration</p>
+                                        <h3 class="text-2xl font-bold text-purple-600" id="visit-stat-avg">0m</h3>
+                                    </div>
+                                    <div class="p-3 bg-purple-50 rounded-lg text-purple-600">
+                                        <i class="fas fa-hourglass-half text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Visit Filters -->
+                        <div
+                            class="flex flex-wrap gap-3 items-center bg-gray-50 p-3 rounded-lg border border-gray-200 mb-4">
+                            <span class="text-sm font-semibold text-gray-600">Filter:</span>
+                            <select id="visit-filter-status" onchange="renderVisitLog()"
+                                class="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white">
+                                <option value="all">All Visits</option>
+                                <option value="active">Active (In Clinic)</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                            <select id="visit-filter-date" onchange="renderVisitLog()"
+                                class="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white">
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                                <option value="all">All Time</option>
+                            </select>
+                            <button onclick="exportVisitLog()"
+                                class="ml-auto text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg transition-colors">
+                                <i class="fas fa-download mr-1"></i> Export
+                            </button>
+                        </div>
+
+                        <!-- Visits Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 text-gray-600 text-sm uppercase tracking-wider">
+                                        <th class="p-4 font-semibold border-b">Student</th>
+                                        <th class="p-4 font-semibold border-b">Date</th>
+                                        <th class="p-4 font-semibold border-b">Time In</th>
+                                        <th class="p-4 font-semibold border-b">Time Out</th>
+                                        <th class="p-4 font-semibold border-b">Duration</th>
+                                        <th class="p-4 font-semibold border-b">Officer</th>
+                                        <th class="p-4 font-semibold border-b">Status</th>
+                                        <th class="p-4 font-semibold border-b text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="visit-log-table" class="text-gray-700 text-sm">
+                                    <!-- Generated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- OFFICERS TAB -->
+                    <div id="medical-tab-officers" class="medical-tab-content hidden p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">Medical Officer Duty Log</h3>
+                                <p class="text-sm text-gray-500">Track officer schedules and duty hours</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="openOfficerRegistrationModal()"
+                                    class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg shadow-md transition-all flex items-center gap-2">
+                                    <i class="fas fa-user-plus"></i> Register Officer
+                                </button>
+                                <button onclick="openOfficerLogModal()"
+                                    class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow-md transition-all flex items-center gap-2">
+                                    <i class="fas fa-user-clock"></i> Log Duty
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Officer Stats -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-purple-50 border border-purple-100 p-4 rounded-lg">
+                                <p class="text-xs font-medium text-purple-600 uppercase">Current Officer</p>
+                                <h3 class="text-xl font-bold text-purple-700" id="current-officer-display">-</h3>
+                                <p class="text-xs text-purple-500 mt-1" id="current-officer-time">Started at --:--</p>
+                            </div>
+                            <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-lg">
+                                <p class="text-xs font-medium text-indigo-600 uppercase">Total Hours Today</p>
+                                <h3 class="text-2xl font-bold text-indigo-700" id="officer-hours-today">0h</h3>
+                            </div>
+                            <div class="bg-teal-50 border border-teal-100 p-4 rounded-lg">
+                                <p class="text-xs font-medium text-teal-600 uppercase">Officers on Roster</p>
+                                <h3 class="text-2xl font-bold text-teal-700" id="officer-roster-count">0</h3>
+                            </div>
+                        </div>
+
+                        <!-- Registered Officers List -->
+                        <div class="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-200">
+                            <h4 class="text-sm font-bold text-gray-700 mb-3">Registered Medical Officers</h4>
+                            <div id="registered-officers-list" class="flex flex-wrap gap-2">
+                                <!-- Generated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Officer Schedule Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 text-gray-600 text-sm uppercase tracking-wider">
+                                        <th class="p-4 font-semibold border-b">Officer Name</th>
+                                        <th class="p-4 font-semibold border-b">Role</th>
+                                        <th class="p-4 font-semibold border-b">Date</th>
+                                        <th class="p-4 font-semibold border-b">Time In</th>
+                                        <th class="p-4 font-semibold border-b">Time Out</th>
+                                        <th class="p-4 font-semibold border-b">Duration</th>
+                                        <th class="p-4 font-semibold border-b">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="officer-log-table" class="text-gray-700 text-sm">
+                                    <!-- Generated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS VIEW -->
+            <div id="view-settings" class="view-section hidden fade-in max-w-2xl mx-auto">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6 border-b border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800">Admin Settings</h3>
+                        <p class="text-sm text-gray-500">Manage your account preferences and security.</p>
+                    </div>
+
+                    <form id="settings-form" onsubmit="saveSettings(event)" class="p-6 space-y-6">
+                        <div class="space-y-4">
+                            <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Profile Information</h4>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Admin Name</label>
+                                <input type="text" id="setting-name" value="Administrator"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                <input type="email" value="admin@edu.com" disabled
+                                    class="w-full px-4 py-2 border border-gray-200 bg-gray-50 rounded-lg text-gray-500 cursor-not-allowed">
+                                <p class="text-xs text-gray-400 mt-1">Contact IT to change email.</p>
+                            </div>
+                        </div>
+
+                        <hr class="border-gray-100">
+
+                        <div class="space-y-4">
+                            <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Security</h4>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                                <input type="password" placeholder="••••••••"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all">
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                                    <input type="password" placeholder="••••••••"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                                    <input type="password" placeholder="••••••••"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 flex justify-end">
+                            <button type="submit"
+                                class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg shadow-md transition-all flex items-center gap-2">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MODAL: Add/Edit Student (Main Registry) - UPDATED WITH GUARDIAN INFO -->
+    <div id="student-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title"
+        role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"
+                onclick="closeModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 max-h-[80vh] overflow-y-auto">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-emerald-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-user text-emerald-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Add New Student
+                            </h3>
+
+                            <div class="mt-4 space-y-6">
+                                <!-- Basic Information -->
+                                <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Basic
+                                        Information</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="col-span-2">
+                                            <label class="block text-sm font-medium text-gray-700">Full Name <span
+                                                    class="text-red-500">*</span></label>
+                                            <input type="text" id="input-name"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
+                                                placeholder="Full Name">
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Gender <span
+                                                    class="text-red-500">*</span></label>
+                                            <div class="flex gap-4 mt-1">
+                                                <label
+                                                    class="flex-1 cursor-pointer border rounded-md p-2 flex items-center justify-center gap-2 hover:bg-gray-50 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500 has-[:checked]:text-blue-700 transition-all bg-white">
+                                                    <input type="radio" name="gender" value="Male" class="hidden"
+                                                        id="gender-male">
+                                                    <i class="fas fa-mars"></i> Male
+                                                </label>
+                                                <label
+                                                    class="flex-1 cursor-pointer border rounded-md p-2 flex items-center justify-center gap-2 hover:bg-gray-50 has-[:checked]:bg-pink-50 has-[:checked]:border-pink-500 has-[:checked]:text-pink-700 transition-all bg-white">
+                                                    <input type="radio" name="gender" value="Female" class="hidden"
+                                                        id="gender-female">
+                                                    <i class="fas fa-venus"></i> Female
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Age <span
+                                                    class="text-red-500">*</span></label>
+                                            <input type="number" id="input-age"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm bg-white"
+                                                placeholder="Age">
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Academic Year</label>
+                                            <input type="text" id="input-academic-year"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm bg-white"
+                                                placeholder="0000-0000">
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Grade Level <span
+                                                    class="text-red-500">*</span></label>
+                                            <select id="input-grade"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm bg-white">
+                                                <option value="">Select</option>
+                                                <option value="Grade 11">Grade 11</option>
+                                                <option value="Grade 12">Grade 12</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Strand <span
+                                                    class="text-red-500">*</span></label>
+                                            <select id="input-strand"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm bg-white">
+                                                <option value="">Select</option>
+                                                <option value="ICT">ICT</option>
+                                                <option value="HUMSS">HUMSS</option>
+                                                <option value="ABM">ABM</option>
+                                                <option value="IA">IA</option>
+                                                <option value="HE">HE</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Guardian Information - NEW SECTION -->
+                                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                                    <h4
+                                        class="text-xs font-bold text-blue-800 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                        <i class="fas fa-users"></i> Guardian Information
+                                    </h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="col-span-2">
+                                            <label class="block text-sm font-medium text-gray-700">Guardian/Parent Name
+                                                <span class="text-red-500">*</span></label>
+                                            <input type="text" id="input-guardian-name"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white"
+                                                placeholder="Full name of parent or guardian">
+                                        </div>
+
+                                        <div class="col-span-2">
+                                            <label class="block text-sm font-medium text-gray-700">Address <span
+                                                    class="text-red-500">*</span></label>
+                                            <textarea id="input-address" rows="2"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white resize-none"
+                                                placeholder="Complete home address"></textarea>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Emergency Contact
+                                                Number <span class="text-red-500">*</span></label>
+                                            <input type="tel" id="input-emergency-contact"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white"
+                                                placeholder="e.g., 0917-123-4567">
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Relationship to
+                                                Student</label>
+                                            <select id="input-relationship"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white">
+                                                <option value="">Select Relationship</option>
+                                                <option value="Mother">Mother</option>
+                                                <option value="Father">Father</option>
+                                                <option value="Grandmother">Grandmother</option>
+                                                <option value="Grandfather">Grandfather</option>
+                                                <option value="Aunt">Aunt</option>
+                                                <option value="Uncle">Uncle</option>
+                                                <option value="Sibling">Sibling</option>
+                                                <option value="Legal Guardian">Legal Guardian</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-200">
+                    <button type="button" onclick="saveStudent()"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-emerald-600 text-base font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Save Student
+                    </button>
+                    <button type="button" onclick="closeModal()"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Register Medical Student (Separate from Main Registry) -->
+    <div id="medical-student-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                onclick="closeMedicalStudentModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-user-plus text-blue-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Register Medical Patient</h3>
+                            <p class="text-sm text-gray-500 mt-1">Add student to medical registry with health conditions
+                            </p>
+
+                            <div class="mt-4 space-y-4">
+                                <!-- Select Existing or New -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Registration
+                                        Type</label>
+                                    <div class="flex gap-4">
+                                        <label
+                                            class="flex-1 cursor-pointer border-2 rounded-lg p-3 flex items-center gap-3 hover:bg-blue-50 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 transition-all bg-white">
+                                            <input type="radio" name="reg-type" value="existing" class="hidden" checked
+                                                onchange="toggleMedicalRegType()">
+                                            <i class="fas fa-search text-blue-500"></i>
+                                            <div>
+                                                <p class="font-medium text-sm">Existing Student</p>
+                                                <p class="text-xs text-gray-500">Select from registry</p>
+                                            </div>
+                                        </label>
+                                        <label
+                                            class="flex-1 cursor-pointer border-2 rounded-lg p-3 flex items-center gap-3 hover:bg-blue-50 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 transition-all bg-white">
+                                            <input type="radio" name="reg-type" value="new" class="hidden"
+                                                onchange="toggleMedicalRegType()">
+                                            <i class="fas fa-user-plus text-blue-500"></i>
+                                            <div>
+                                                <p class="font-medium text-sm">New Patient</p>
+                                                <p class="text-xs text-gray-500">Create new record</p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Existing Student Select with Search -->
+                                <div id="existing-student-select">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Select Student <span
+                                            class="text-red-500">*</span></label>
+                                    <!-- Custom Searchable Dropdown -->
+                                    <div class="searchable-dropdown" id="student-search-dropdown">
+                                        <div class="relative">
+                                            <input type="text" id="student-search-input"
+                                                class="searchable-dropdown-input" placeholder="Search for a student..."
+                                                readonly onclick="toggleStudentDropdown()">
+                                            <i class="fas fa-times searchable-dropdown-clear" id="student-clear-btn"
+                                                onclick="clearStudentSelection(event)"></i>
+                                        </div>
+                                        <div class="searchable-dropdown-menu" id="student-dropdown-menu">
+                                            <div class="searchable-dropdown-search">
+                                                <input type="text" id="student-filter-input"
+                                                    placeholder="Type to search..." onkeyup="filterStudentDropdown()"
+                                                    onclick="event.stopPropagation()">
+                                            </div>
+                                            <ul class="searchable-dropdown-list" id="student-dropdown-list">
+                                                <!-- Populated by JS -->
+                                            </ul>
+                                        </div>
+                                        <input type="hidden" id="med-reg-student" value="">
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">Click to search and select from registered
+                                        students</p>
+                                </div>
+
+                                <!-- New Student Fields (Hidden by default) -->
+                                <div id="new-student-fields" class="hidden space-y-3">
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Full Name <span
+                                                    class="text-red-500">*</span></label>
+                                            <input type="text" id="med-reg-name"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Student ID <span
+                                                    class="text-red-500">*</span></label>
+                                            <input type="text" id="med-reg-id"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                                placeholder="STU-2026-XXX">
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Gender</label>
+                                            <select id="med-reg-gender"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white">
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Age</label>
+                                            <input type="number" id="med-reg-age"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Medical Conditions -->
+                                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                                    <h4 class="text-xs font-bold text-blue-800 uppercase tracking-wider mb-3">Medical
+                                        Conditions</h4>
+                                    <div class="grid grid-cols-4 sm:grid-cols-7 gap-2 mb-3">
+                                        <div class="medical-icon-btn flex flex-col items-center justify-center p-2 border rounded-lg cursor-pointer hover:bg-white bg-white"
+                                            onclick="toggleMedicalIcon(this, 'Eyesight')">
+                                            <div class="text-xl mb-1">👁️</div>
+                                            <span class="text-[10px] text-gray-600 text-center">Eye</span>
+                                            <div class="indicator-dot w-1.5 h-1.5 bg-blue-500 rounded-full mt-1"></div>
+                                        </div>
+                                        <div class="medical-icon-btn flex flex-col items-center justify-center p-2 border rounded-lg cursor-pointer hover:bg-white bg-white"
+                                            onclick="toggleMedicalIcon(this, 'Bone/Muscle')">
+                                            <div class="text-xl mb-1">🦴</div>
+                                            <span class="text-[10px] text-gray-600 text-center">Bone</span>
+                                            <div class="indicator-dot w-1.5 h-1.5 bg-blue-500 rounded-full mt-1"></div>
+                                        </div>
+                                        <div class="medical-icon-btn flex flex-col items-center justify-center p-2 border rounded-lg cursor-pointer hover:bg-white bg-white"
+                                            onclick="toggleMedicalIcon(this, 'Ear')">
+                                            <div class="text-xl mb-1">👂</div>
+                                            <span class="text-[10px] text-gray-600 text-center">Ear</span>
+                                            <div class="indicator-dot w-1.5 h-1.5 bg-blue-500 rounded-full mt-1"></div>
+                                        </div>
+                                        <div class="medical-icon-btn flex flex-col items-center justify-center p-2 border rounded-lg cursor-pointer hover:bg-white bg-white"
+                                            onclick="toggleMedicalIcon(this, 'Speech/Hearing')">
+                                            <div class="text-xl mb-1">👄</div>
+                                            <span class="text-[10px] text-gray-600 text-center">Speech</span>
+                                            <div class="indicator-dot w-1.5 h-1.5 bg-blue-500 rounded-full mt-1"></div>
+                                        </div>
+                                        <div class="medical-icon-btn flex flex-col items-center justify-center p-2 border rounded-lg cursor-pointer hover:bg-white bg-white"
+                                            onclick="toggleMedicalIcon(this, 'Heart')">
+                                            <div class="text-xl mb-1">❤️</div>
+                                            <span class="text-[10px] text-gray-600 text-center">Heart</span>
+                                            <div class="indicator-dot w-1.5 h-1.5 bg-blue-500 rounded-full mt-1"></div>
+                                        </div>
+                                        <div class="medical-icon-btn flex flex-col items-center justify-center p-2 border rounded-lg cursor-pointer hover:bg-white bg-white"
+                                            onclick="toggleMedicalIcon(this, 'Organ')">
+                                            <div class="text-xl mb-1">🫁</div>
+                                            <span class="text-[10px] text-gray-600 text-center">Organ</span>
+                                            <div class="indicator-dot w-1.5 h-1.5 bg-blue-500 rounded-full mt-1"></div>
+                                        </div>
+                                        <div class="medical-icon-btn flex flex-col items-center justify-center p-2 border rounded-lg cursor-pointer hover:bg-white bg-white"
+                                            onclick="toggleMedicalIcon(this, 'Others')">
+                                            <div class="text-xl mb-1">📝</div>
+                                            <span class="text-[10px] text-gray-600 text-center">Other</span>
+                                            <div class="indicator-dot w-1.5 h-1.5 bg-blue-500 rounded-full mt-1"></div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Medical Notes / Care
+                                            Instructions</label>
+                                        <textarea id="med-reg-notes" rows="3"
+                                            class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm resize-none bg-white"
+                                            placeholder="Enter detailed medical information, medications, emergency procedures..."></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Registration Date/Time -->
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Registration Date</label>
+                                        <input type="date" id="med-reg-date"
+                                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Time</label>
+                                        <input type="time" id="med-reg-time"
+                                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-200">
+                    <button type="button" onclick="saveMedicalStudent()"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Register Patient
+                    </button>
+                    <button type="button" onclick="closeMedicalStudentModal()"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Log Medical Visit -->
+    <div id="medical-log-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeMedicalLogModal()">
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-heartbeat text-red-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Log Clinic Visit</h3>
+
+                            <div class="mt-4 space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Patient <span
+                                            class="text-red-500">*</span></label>
+                                    <select id="log-student-select"
+                                        class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm bg-white">
+                                        <option value="">Select Patient</option>
+                                    </select>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Date <span
+                                                class="text-red-500">*</span></label>
+                                        <input type="date" id="
+                                        <input type=" date" id="log-date"
+                                            class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm bg-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Time In <span
+                                                class="text-red-500">*</span></label>
+                                        <input type="time" id="log-time-in"
+                                            class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm bg-white">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Time Out (if
+                                        completed)</label>
+                                    <input type="time" id="log-time-out"
+                                        class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm bg-white">
+                                    <p class="text-xs text-gray-500 mt-1">Leave blank if patient is still in clinic</p>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Medical Officer <span
+                                            class="text-red-500">*</span></label>
+                                    <select id="log-officer"
+                                        class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm bg-white">
+                                        <option value="">Select Officer</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Reason for Visit</label>
+                                    <textarea id="log-notes" rows="2"
+                                        class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm resize-none bg-white"
+                                        placeholder="e.g., Headache, checkup, medication..."></textarea>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Treatment Given</label>
+                                    <input type="text" id="log-treatment"
+                                        class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm bg-white"
+                                        placeholder="e.g., Rest, medication, first aid...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-200">
+                    <button type="button" onclick="saveMedicalLog()"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-500 text-base font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Log Visit
+                    </button>
+                    <button type="button" onclick="closeMedicalLogModal()"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Register Medical Officer -->
+    <div id="officer-registration-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                onclick="closeOfficerRegistrationModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-purple-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-user-md text-purple-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Register Medical Officer</h3>
+
+                            <div class="mt-4 space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Officer Name <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" id="officer-reg-name"
+                                        class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm bg-white"
+                                        placeholder="Dr. Smith">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Role/Position <span
+                                            class="text-red-500">*</span></label>
+                                    <select id="officer-reg-role"
+                                        class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm bg-white">
+                                        <option value="School Nurse">School Nurse</option>
+                                        <option value="School Physician">School Physician</option>
+                                        <option value="Medical Assistant">Medical Assistant</option>
+                                        <option value="Dentist">Dentist</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">License Number</label>
+                                    <input type="text" id="officer-reg-license"
+                                        class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm bg-white"
+                                        placeholder="Optional">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+                                    <input type="text" id="officer-reg-contact"
+                                        class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm bg-white"
+                                        placeholder="Optional">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-200">
+                    <button type="button" onclick="saveOfficerRegistration()"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Register Officer
+                    </button>
+                    <button type="button" onclick="closeOfficerRegistrationModal()"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Log Officer Duty -->
+    <div id="officer-log-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeOfficerLogModal()">
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-user-clock text-indigo-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Log Officer Duty</h3>
+
+                            <div class="mt-4 space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Officer <span
+                                            class="text-red-500">*</span></label>
+                                    <select id="duty-officer-select"
+                                        class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
+                                        <option value="">Select Officer</option>
+                                    </select>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Date <span
+                                                class="text-red-500">*</span></label>
+                                        <input type="date" id="duty-date"
+                                            class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Time In <span
+                                                class="text-red-500">*</span></label>
+                                        <input type="time" id="duty-time-in"
+                                            class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Time Out</label>
+                                    <input type="time" id="duty-time-out"
+                                        class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
+                                    <p class="text-xs text-gray-500 mt-1">Leave blank if currently on duty</p>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                                    <textarea id="duty-notes" rows="2"
+                                        class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm resize-none bg-white"
+                                        placeholder="Shift notes, observations..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-200">
+                    <button type="button" onclick="saveOfficerLog()"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Log Duty
+                    </button>
+                    <button type="button" onclick="closeOfficerLogModal()"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: View Medical Details -->
+    <div id="medical-details-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                onclick="closeMedicalDetailsModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 max-h-[80vh] overflow-y-auto">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-emerald-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-file-medical text-emerald-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Medical Record Details</h3>
+
+                            <div id="medical-details-content" class="mt-4 space-y-4">
+                                <!-- Content populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-200">
+                    <button type="button" onclick="closeMedicalDetailsModal()"
+                        class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <div class="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3">
+            <i id="toast-icon" class="fas fa-check-circle text-emerald-400"></i>
+            <span id="toast-message">Operation successful</span>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        let students = JSON.parse(localStorage.getItem('students')) || [];
+        let medicalPatients = JSON.parse(localStorage.getItem('medicalPatients')) || [];
+        let medicalVisits = JSON.parse(localStorage.getItem('medicalVisits')) || [];
+        let officers = JSON.parse(localStorage.getItem('officers')) || [
+            { id: 'OFF-001', name: 'Sarah Johnson', role: 'School Nurse', license: 'RN-12345', contact: '555-0101' },
+            { id: 'OFF-002', name: 'Dr. Michael Chen', role: 'School Physician', license: 'MD-67890', contact: '555-0102' }
+        ];
+        let officerLogs = JSON.parse(localStorage.getItem('officerLogs')) || [];
+
+        let currentOfficer = localStorage.getItem('currentOfficer') || (officers.length > 0 ? officers[0].id : '');
+        let currentMedicalFilter = 'all';
+        let editingStudentId = null;
+        let selectedMedicalConditions = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            initClock();
+            initOfficerSelect();
+            initStudentDropdown();
+            renderAll();
+            updateDashboard();
+
+            // Set default dates
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            const timeStr = now.toTimeString().slice(0, 5);
+
+            document.getElementById('med-reg-date').value = dateStr;
+            document.getElementById('med-reg-time').value = timeStr;
+            document.getElementById('log-date').value = dateStr;
+            document.getElementById('log-time-in').value = timeStr;
+            document.getElementById('duty-date').value = dateStr;
+            document.getElementById('duty-time-in').value = timeStr;
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function (e) {
+                const dropdown = document.getElementById('student-dropdown-menu');
+                const input = document.getElementById('student-search-input');
+                if (!dropdown.contains(e.target) && e.target !== input) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        });
+
+        // Clock Widget
+        function initClock() {
+            function updateClock() {
+                const now = new Date();
+                document.getElementById('live-clock').textContent = now.toLocaleTimeString('en-US', { hour12: false });
+                document.getElementById('live-date').textContent = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        // Navigation
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        function switchTab(tabName) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('bg-emerald-500', 'shadow-md', 'text-white');
+                el.classList.add('text-emerald-100');
+            });
+
+            // Show selected view
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabName}`).classList.add('bg-emerald-500', 'shadow-md', 'text-white');
+            document.getElementById(`nav-${tabName}`).classList.remove('text-emerald-100');
+
+            // Update title
+            const titles = {
+                'dashboard': 'Dashboard',
+                'students': 'Student Registry',
+                'medical': 'Medical Records',
+                'settings': 'Settings'
+            };
+            document.getElementById('page-title').textContent = titles[tabName];
+
+            // Refresh data
+            if (tabName === 'medical') {
+                renderMedicalPatients();
+                renderVisitLog();
+                renderOfficerLog();
+            } else if (tabName === 'students') {
+                renderStudents();
+            } else if (tabName === 'dashboard') {
+                updateDashboard();
+            }
+
+            // Close mobile sidebar
+            if (window.innerWidth < 1024) {
+                toggleSidebar();
+            }
+        }
+
+        // Medical Tab Navigation
+        function switchMedicalTab(tabName) {
+            document.querySelectorAll('.medical-tab').forEach(el => {
+                el.classList.remove('active');
+                el.classList.remove('text-emerald-600', 'border-b-2', 'border-emerald-600');
+                el.classList.add('text-gray-600');
+            });
+            document.querySelectorAll('.medical-tab-content').forEach(el => el.classList.add('hidden'));
+
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            document.getElementById(`medical-tab-${tabName}`).classList.remove('hidden');
+
+            if (tabName === 'patients') renderMedicalPatients();
+            if (tabName === 'visits') renderVisitLog();
+            if (tabName === 'officers') renderOfficerLog();
+        }
+
+        // Dashboard Updates
+        function updateDashboard() {
+            document.getElementById('stat-total').textContent = students.length;
+            document.getElementById('stat-medical').textContent = medicalPatients.length;
+
+            const activeVisits = medicalVisits.filter(v => !v.timeOut).length;
+            document.getElementById('stat-active-visits').textContent = activeVisits;
+
+            const today = new Date().toISOString().split('T')[0];
+            const todayVisits = medicalVisits.filter(v => v.date === today).length;
+            document.getElementById('stat-today-visits').textContent = todayVisits;
+
+            // Update officer info
+            const officer = officers.find(o => o.id === currentOfficer);
+            if (officer) {
+                document.getElementById('dash-officer-name').textContent = officer.name;
+                document.getElementById('dash-officer-role').textContent = officer.role;
+            }
+
+            // Update medical badge
+            const badge = document.getElementById('medical-badge');
+            if (activeVisits > 0) {
+                badge.textContent = activeVisits;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // Student Management
+        function renderStudents() {
+            const tbody = document.getElementById('student-table-body');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const strandFilter = document.getElementById('filter-strand').value;
+            const gradeFilter = document.getElementById('filter-grade').value;
+            const genderFilter = document.getElementById('filter-gender').value;
+
+            let filtered = students.filter(s => {
+                const matchesSearch = s.name.toLowerCase().includes(search) || s.id.toLowerCase().includes(search);
+                const matchesStrand = !strandFilter || s.strand === strandFilter;
+                const matchesGrade = !gradeFilter || s.grade === gradeFilter;
+                const matchesGender = !genderFilter || s.gender === genderFilter;
+                return matchesSearch && matchesStrand && matchesGrade && matchesGender;
+            });
+
+            if (filtered.length === 0) {
+                document.getElementById('empty-state').classList.remove('hidden');
+                document.getElementById('empty-state').classList.add('flex');
+                tbody.innerHTML = '';
+                return;
+            }
+
+            document.getElementById('empty-state').classList.add('hidden');
+            document.getElementById('empty-state').classList.remove('flex');
+
+            tbody.innerHTML = filtered.map(student => {
+                const isMedical = medicalPatients.some(p => p.studentId === student.id);
+                const medicalStatus = isMedical ?
+                    '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"><i class="fas fa-heartbeat mr-1"></i>Registered</span>' :
+                    '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">None</span>';
+
+                return `
+                    <tr class="hover:bg-gray-50 transition-colors border-b border-gray-100">
+                        <td class="p-4 font-medium text-gray-900">${student.id}</td>
+                        <td class="p-4">
+                            <div class="flex items-center">
+                                <div class="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-xs mr-3">
+                                    ${student.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                                </div>
+                                <div>
+                                    <div class="font-medium text-gray-900">${student.name}</div>
+                                    <div class="text-xs text-gray-500">${student.email || 'No email'}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4"><span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium ${student.gender === 'Male' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'}">${student.gender}</span></td>
+                        <td class="p-4">${student.age}</td>
+                        <td class="p-4">${student.grade}</td>
+                        <td class="p-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">${student.strand}</span></td>
+                        <td class="p-4 text-center">${medicalStatus}</td>
+                        <td class="p-4 text-right">
+                            <button onclick="editStudent('${student.id}')" class="text-emerald-600 hover:text-emerald-900 mr-3"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteStudent('${student.id}')" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function applyFilters() {
+            renderStudents();
+        }
+
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('filter-strand').value = '';
+            document.getElementById('filter-grade').value = '';
+            document.getElementById('filter-gender').value = '';
+            renderStudents();
+        }
+
+        // Modal Functions
+        function openModal() {
+            editingStudentId = null;
+            document.getElementById('modal-title').textContent = 'Add New Student';
+            document.getElementById('student-modal').classList.remove('hidden');
+            clearStudentForm();
+        }
+
+        function closeModal() {
+            document.getElementById('student-modal').classList.add('hidden');
+            editingStudentId = null;
+        }
+
+        function clearStudentForm() {
+            document.getElementById('input-name').value = '';
+            document.getElementById('input-age').value = '';
+            document.getElementById('input-academic-year').value = '';
+            document.getElementById('input-grade').value = '';
+            document.getElementById('input-strand').value = '';
+            document.querySelectorAll('input[name="gender"]').forEach(el => el.checked = false);
+            // Clear guardian fields
+            document.getElementById('input-guardian-name').value = '';
+            document.getElementById('input-address').value = '';
+            document.getElementById('input-emergency-contact').value = '';
+            document.getElementById('input-relationship').value = '';
+        }
+
+        function saveStudent() {
+            const name = document.getElementById('input-name').value.trim();
+            const age = document.getElementById('input-age').value;
+            const academicYear = document.getElementById('input-academic-year').value;
+            const grade = document.getElementById('input-grade').value;
+            const strand = document.getElementById('input-strand').value;
+            const gender = document.querySelector('input[name="gender"]:checked')?.value;
+
+            // Guardian information
+            const guardianName = document.getElementById('input-guardian-name').value.trim();
+            const address = document.getElementById('input-address').value.trim();
+            const emergencyContact = document.getElementById('input-emergency-contact').value.trim();
+            const relationship = document.getElementById('input-relationship').value;
+
+            if (!name || !age || !grade || !strand || !gender || !guardianName || !address || !emergencyContact) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+
+            const studentData = {
+                id: editingStudentId || `STU-${new Date().getFullYear()}-${String(students.length + 1).padStart(3, '0')}`,
+                name,
+                age: parseInt(age),
+                academicYear,
+                grade,
+                strand,
+                gender,
+                email: `${name.toLowerCase().replace(/\s+/g, '.')}@edu.com`,
+                // Guardian information
+                guardianName,
+                address,
+                emergencyContact,
+                relationship,
+                createdAt: new Date().toISOString()
+            };
+
+            if (editingStudentId) {
+                const index = students.findIndex(s => s.id === editingStudentId);
+                students[index] = { ...students[index], ...studentData };
+                showToast('Student updated successfully');
+            } else {
+                students.push(studentData);
+                showToast('Student added successfully');
+            }
+
+            localStorage.setItem('students', JSON.stringify(students));
+            closeModal();
+            renderStudents();
+            updateDashboard();
+        }
+
+        function editStudent(id) {
+            const student = students.find(s => s.id === id);
+            if (!student) return;
+
+            editingStudentId = id;
+            document.getElementById('modal-title').textContent = 'Edit Student';
+            document.getElementById('input-name').value = student.name;
+            document.getElementById('input-age').value = student.age;
+            document.getElementById('input-academic-year').value = student.academicYear || '';
+            document.getElementById('input-grade').value = student.grade;
+            document.getElementById('input-strand').value = student.strand;
+
+            if (student.gender === 'Male') document.getElementById('gender-male').checked = true;
+            if (student.gender === 'Female') document.getElementById('gender-female').checked = true;
+
+            // Load guardian information
+            document.getElementById('input-guardian-name').value = student.guardianName || '';
+            document.getElementById('input-address').value = student.address || '';
+            document.getElementById('input-emergency-contact').value = student.emergencyContact || '';
+            document.getElementById('input-relationship').value = student.relationship || '';
+
+            document.getElementById('student-modal').classList.remove('hidden');
+        }
+
+        function deleteStudent(id) {
+            if (!confirm('Are you sure you want to delete this student?')) return;
+
+            students = students.filter(s => s.id !== id);
+            medicalPatients = medicalPatients.filter(p => p.studentId !== id);
+
+            localStorage.setItem('students', JSON.stringify(students));
+            localStorage.setItem('medicalPatients', JSON.stringify(medicalPatients));
+
+            renderStudents();
+            updateDashboard();
+            showToast('Student deleted successfully');
+        }
+
+        // Medical Patient Management
+        function renderMedicalPatients() {
+            const tbody = document.getElementById('medical-patients-table');
+            let filtered = currentMedicalFilter === 'all' ? medicalPatients :
+                medicalPatients.filter(p => p.conditions.includes(currentMedicalFilter));
+
+            document.getElementById('medical-patient-count').textContent = medicalPatients.length;
+            document.getElementById('medical-critical-count').textContent = medicalPatients.filter(p => p.severity === 'Critical').length;
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('medical-today-visits').textContent = medicalVisits.filter(v => v.date === today).length;
+            document.getElementById('medical-active-count').textContent = medicalVisits.filter(v => !v.timeOut).length;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-gray-500">No medical patients found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(patient => {
+                const student = students.find(s => s.id === patient.studentId) || { name: patient.name || 'Unknown', id: patient.studentId };
+                const isInClinic = medicalVisits.some(v => v.patientId === patient.id && !v.timeOut);
+
+                const conditionBadges = patient.conditions.map(c => {
+                    const colors = {
+                        'Heart': 'bg-red-100 text-red-800',
+                        'Eyesight': 'bg-blue-100 text-blue-800',
+                        'Bone/Muscle': 'bg-yellow-100 text-yellow-800',
+                        'Organ': 'bg-purple-100 text-purple-800',
+                        'Ear': 'bg-orange-100 text-orange-800',
+                        'Speech/Hearing': 'bg-pink-100 text-pink-800',
+                        'Others': 'bg-gray-100 text-gray-800'
+                    };
+                    return `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${colors[c] || 'bg-gray-100 text-gray-800'} mr-1">${c}</span>`;
+                }).join('');
+
+                return `
+                    <tr class="hover:bg-gray-50 transition-colors border-b border-gray-100">
+                        <td class="p-4 font-medium text-gray-900">${patient.id}</td>
+                        <td class="p-4">
+                            <div class="font-medium text-gray-900">${student.name}</div>
+                            <div class="text-xs text-gray-500">${patient.studentId}</div>
+                        </td>
+                        <td class="p-4">${conditionBadges}</td>
+                        <td class="p-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${patient.severity === 'Critical' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}">
+                                ${patient.severity || 'Standard'}
+                            </span>
+                        </td>
+                        <td class="p-4 text-sm text-gray-500">${new Date(patient.registeredDate).toLocaleDateString()}</td>
+                        <td class="p-4 text-center">
+                            ${isInClinic ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><span class="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></span>In Clinic</span>' : '<span class="text-gray-400">-</span>'}
+                        </td>
+                        <td class="p-4 text-right">
+                            <button onclick="viewMedicalDetails('${patient.id}')" class="text-blue-600 hover:text-blue-900 mr-3"><i class="fas fa-eye"></i></button>
+                            <button onclick="deleteMedicalPatient('${patient.id}')" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterMedicalPatients(condition) {
+            currentMedicalFilter = condition;
+            document.querySelectorAll('.medical-filter-btn').forEach(btn => {
+                if (btn.dataset.condition === condition) {
+                    btn.classList.add('bg-emerald-600', 'text-white');
+                    btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-300');
+                } else {
+                    btn.classList.remove('bg-emerald-600', 'text-white');
+                    btn.classList.add('bg-white', 'text-gray-600', 'border-gray-300');
+                }
+            });
+            renderMedicalPatients();
+        }
+
+        // Medical Student Modal
+        function openMedicalStudentModal() {
+            selectedMedicalConditions = [];
+            document.querySelectorAll('.medical-icon-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.getElementById('medical-student-modal').classList.remove('hidden');
+            initStudentDropdown();
+        }
+
+        function closeMedicalStudentModal() {
+            document.getElementById('medical-student-modal').classList.add('hidden');
+            clearMedicalStudentForm();
+        }
+
+        function clearMedicalStudentForm() {
+            document.getElementById('med-reg-student').value = '';
+            document.getElementById('student-search-input').value = '';
+            document.getElementById('med-reg-name').value = '';
+            document.getElementById('med-reg-id').value = '';
+            document.getElementById('med-reg-notes').value = '';
+            selectedMedicalConditions = [];
+            document.querySelectorAll('.medical-icon-btn').forEach(btn => btn.classList.remove('selected'));
+        }
+
+        function toggleMedicalRegType() {
+            const type = document.querySelector('input[name="reg-type"]:checked').value;
+            if (type === 'existing') {
+                document.getElementById('existing-student-select').classList.remove('hidden');
+                document.getElementById('new-student-fields').classList.add('hidden');
+            } else {
+                document.getElementById('existing-student-select').classList.add('hidden');
+                document.getElementById('new-student-fields').classList.remove('hidden');
+            }
+        }
+
+        function toggleMedicalIcon(btn, condition) {
+            btn.classList.toggle('selected');
+            if (selectedMedicalConditions.includes(condition)) {
+                selectedMedicalConditions = selectedMedicalConditions.filter(c => c !== condition);
+            } else {
+                selectedMedicalConditions.push(condition);
+            }
+        }
+
+        function saveMedicalStudent() {
+            const regType = document.querySelector('input[name="reg-type"]:checked').value;
+            const date = document.getElementById('med-reg-date').value;
+            const time = document.getElementById('med-reg-time').value;
+            const notes = document.getElementById('med-reg-notes').value;
+
+            let studentId, name, gender, age;
+
+            if (regType === 'existing') {
+                studentId = document.getElementById('med-reg-student').value;
+                if (!studentId) {
+                    showToast('Please select a student', 'error');
+                    return;
+                }
+                const student = students.find(s => s.id === studentId);
+                name = student.name;
+                gender = student.gender;
+                age = student.age;
+            } else {
+                name = document.getElementById('med-reg-name').value.trim();
+                studentId = document.getElementById('med-reg-id').value.trim();
+                gender = document.getElementById('med-reg-gender').value;
+                age = document.getElementById('med-reg-age').value;
+
+                if (!name || !studentId) {
+                    showToast('Please fill in all required fields', 'error');
+                    return;
+                }
+            }
+
+            if (selectedMedicalConditions.length === 0) {
+                showToast('Please select at least one medical condition', 'error');
+                return;
+            }
+
+            const patientData = {
+                id: `MED-${Date.now()}`,
+                studentId,
+                name: regType === 'new' ? name : undefined,
+                gender: regType === 'new' ? gender : undefined,
+                age: regType === 'new' ? parseInt(age) : undefined,
+                conditions: selectedMedicalConditions,
+                severity: selectedMedicalConditions.includes('Heart') || selectedMedicalConditions.includes('Organ') ? 'Critical' : 'Standard',
+                notes,
+                registeredDate: `${date}T${time}`,
+                registeredBy: currentOfficer
+            };
+
+            medicalPatients.push(patientData);
+            localStorage.setItem('medicalPatients', JSON.stringify(medicalPatients));
+
+            showToast('Medical patient registered successfully');
+            closeMedicalStudentModal();
+            renderMedicalPatients();
+            updateDashboard();
+        }
+
+        function deleteMedicalPatient(id) {
+            if (!confirm('Are you sure you want to remove this medical record?')) return;
+            medicalPatients = medicalPatients.filter(p => p.id !== id);
+            localStorage.setItem('medicalPatients', JSON.stringify(medicalPatients));
+            renderMedicalPatients();
+            updateDashboard();
+            showToast('Medical record removed');
+        }
+
+        // Visit Log Management
+        function renderVisitLog() {
+            const statusFilter = document.getElementById('visit-filter-status').value;
+            const dateFilter = document.getElementById('visit-filter-date').value;
+
+            let filtered = medicalVisits;
+
+            if (statusFilter === 'active') filtered = filtered.filter(v => !v.timeOut);
+            if (statusFilter === 'completed') filtered = filtered.filter(v => v.timeOut);
+
+            const today = new Date().toISOString().split('T')[0];
+            const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+            if (dateFilter === 'today') filtered = filtered.filter(v => v.date === today);
+            else if (dateFilter === 'week') filtered = filtered.filter(v => v.date >= weekAgo);
+            else if (dateFilter === 'month') filtered = filtered.filter(v => v.date.slice(0, 7) === today.slice(0, 7));
+
+            // Update stats
+            document.getElementById('visit-stat-today').textContent = medicalVisits.filter(v => v.date === today).length;
+            document.getElementById('visit-stat-active').textContent = medicalVisits.filter(v => !v.timeOut).length;
+            document.getElementById('visit-stat-week').textContent = medicalVisits.filter(v => v.date >= weekAgo).length;
+
+            const completedVisits = medicalVisits.filter(v => v.timeOut);
+            const avgDuration = completedVisits.length > 0 ?
+                Math.round(completedVisits.reduce((acc, v) => acc + v.duration, 0) / completedVisits.length) : 0;
+            document.getElementById('visit-stat-avg').textContent = avgDuration + 'm';
+
+            // Update badge
+            const activeCount = medicalVisits.filter(v => !v.timeOut).length;
+            const badge = document.getElementById('visit-count-badge');
+            if (activeCount > 0) {
+                badge.textContent = activeCount;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            const tbody = document.getElementById('visit-log-table');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-gray-500">No visits found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(visit => {
+                const patient = medicalPatients.find(p => p.id === visit.patientId) || {};
+                const student = students.find(s => s.id === patient.studentId) || { name: patient.name || 'Unknown' };
+                const officer = officers.find(o => o.id === visit.officerId) || { name: 'Unknown' };
+
+                const duration = visit.duration ? `${visit.duration}m` : (visit.timeOut ? 'N/A' : '-');
+                const statusClass = !visit.timeOut ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
+                const statusText = !visit.timeOut ? 'Active' : 'Completed';
+
+                return `
+                    <tr class="hover:bg-gray-50 transition-colors border-b border-gray-100">
+                        <td class="p-4">
+                            <div class="font-medium text-gray-900">${student.name}</div>
+                            <div class="text-xs text-gray-500">${patient.studentId || visit.patientId}</div>
+                        </td>
+                        <td class="p-4 text-sm">${new Date(visit.date).toLocaleDateString()}</td>
+                        <td class="p-4 text-sm font-mono">${visit.timeIn}</td>
+                        <td class="p-4 text-sm font-mono">${visit.timeOut || '-'}</td>
+                        <td class="p-4 text-sm">${duration}</td>
+                        <td class="p-4 text-sm">${officer.name}</td>
+                        <td class="p-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClass}">
+                                ${statusText}
+                            </span>
+                        </td>
+                        <td class="p-4 text-right">
+                            ${!visit.timeOut ? `<button onclick="checkoutPatient('${visit.id}')" class="text-emerald-600 hover:text-emerald-900 mr-3" title="Check Out"><i class="fas fa-sign-out-alt"></i></button>` : ''}
+                            <button onclick="viewVisitDetails('${visit.id}')" class="text-blue-600 hover:text-blue-900 mr-3"><i class="fas fa-eye"></i></button>
+                            <button onclick="deleteVisit('${visit.id}')" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openMedicalLogModal() {
+            const select = document.getElementById('log-student-select');
+            select.innerHTML = '<option value="">Select Patient</option>' +
+                medicalPatients.map(p => {
+                    const student = students.find(s => s.id === p.studentId) || { name: p.name };
+                    return `<option value="${p.id}">${student.name} (${p.conditions.join(', ')})</option>`;
+                }).join('');
+
+            const officerSelect = document.getElementById('log-officer');
+            officerSelect.innerHTML = '<option value="">Select Officer</option>' +
+                officers.map(o => `<option value="${o.id}" ${o.id === currentOfficer ? 'selected' : ''}>${o.name} (${o.role})</option>`).join('');
+
+            const now = new Date();
+            document.getElementById('log-date').value = now.toISOString().split('T')[0];
+            document.getElementById('log-time-in').value = now.toTimeString().slice(0, 5);
+            document.getElementById('log-time-out').value = '';
+            document.getElementById('log-notes').value = '';
+            document.getElementById('log-treatment').value = '';
+
+            document.getElementById('medical-log-modal').classList.remove('hidden');
+        }
+
+        function closeMedicalLogModal() {
+            document.getElementById('medical-log-modal').classList.add('hidden');
+        }
+
+        function saveMedicalLog() {
+            const patientId = document.getElementById('log-student-select').value;
+            const date = document.getElementById('log-date').value;
+            const timeIn = document.getElementById('log-time-in').value;
+            const timeOut = document.getElementById('log-time-out').value;
+            const officerId = document.getElementById('log-officer').value;
+            const notes = document.getElementById('log-notes').value;
+            const treatment = document.getElementById('log-treatment').value;
+
+            if (!patientId || !date || !timeIn || !officerId) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+
+            let duration = null;
+            if (timeOut) {
+                const start = new Date(`2000-01-01T${timeIn}`);
+                const end = new Date(`2000-01-01T${timeOut}`);
+                duration = Math.round((end - start) / 60000);
+            }
+
+            const visitData = {
+                id: `VIS-${Date.now()}`,
+                patientId,
+                date,
+                timeIn,
+                timeOut: timeOut || null,
+                duration,
+                officerId,
+                notes,
+                treatment,
+                createdAt: new Date().toISOString()
+            };
+
+            medicalVisits.push(visitData);
+            localStorage.setItem('medicalVisits', JSON.stringify(medicalVisits));
+
+            showToast('Visit logged successfully');
+            closeMedicalLogModal();
+            renderVisitLog();
+            updateDashboard();
+        }
+
+        function checkoutPatient(visitId) {
+            const visit = medicalVisits.find(v => v.id === visitId);
+            if (!visit) return;
+
+            const now = new Date();
+            const timeOut = now.toTimeString().slice(0, 5);
+            const start = new Date(`2000-01-01T${visit.timeIn}`);
+            const end = new Date(`2000-01-01T${timeOut}`);
+            const duration = Math.round((end - start) / 60000);
+
+            visit.timeOut = timeOut;
+            visit.duration = duration;
+
+            localStorage.setItem('medicalVisits', JSON.stringify(medicalVisits));
+            renderVisitLog();
+            updateDashboard();
+            showToast('Patient checked out successfully');
+        }
+
+        function deleteVisit(id) {
+            if (!confirm('Are you sure you want to delete this visit record?')) return;
+            medicalVisits = medicalVisits.filter(v => v.id !== id);
+            localStorage.setItem('medicalVisits', JSON.stringify(medicalVisits));
+            renderVisitLog();
+            updateDashboard();
+            showToast('Visit record deleted');
+        }
+
+        // Officer Management
+        function initOfficerSelect() {
+            const select = document.getElementById('current-officer-select');
+            select.innerHTML = officers.map(o =>
+                `<option value="${o.id}" ${o.id === currentOfficer ? 'selected' : ''}>${o.name}</option>`
+            ).join('');
+
+            updateOfficer();
+        }
+
+        function updateOfficer() {
+            currentOfficer = document.getElementById('current-officer-select').value;
+            localStorage.setItem('currentOfficer', currentOfficer);
+
+            const officer = officers.find(o => o.id === currentOfficer);
+            if (officer) {
+                document.getElementById('dash-officer-name').textContent = officer.name;
+                document.getElementById('dash-officer-role').textContent = officer.role;
+                document.getElementById('current-officer-display').textContent = officer.name;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+            const todayLogs = officerLogs.filter(l => l.officerId === currentOfficer && l.date === today && !l.timeOut);
+            document.getElementById('dash-duty-start').textContent = todayLogs.length > 0 ? todayLogs[0].timeIn : '08:00 AM';
+            document.getElementById('current-officer-time').textContent = `Started at ${todayLogs.length > 0 ? todayLogs[0].timeIn : '--:--'}`;
+        }
+
+        function renderOfficerLog() {
+            document.getElementById('officer-roster-count').textContent = officers.length;
+
+            const today = new Date().toISOString().split('T')[0];
+            const todayLogs = officerLogs.filter(l => l.date === today);
+            const totalMinutes = todayLogs.reduce((acc, log) => acc + (log.duration || 0), 0);
+            document.getElementById('officer-hours-today').textContent = Math.round(totalMinutes / 60 * 10) / 10 + 'h';
+
+            // Render registered officers
+            document.getElementById('registered-officers-list').innerHTML = officers.map(o => `
+                <div class="officer-card bg-white border border-gray-200 rounded-lg p-3 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm text-gray-900">${o.name}</p>
+                        <p class="text-xs text-gray-500">${o.role}</p>
+                    </div>
+                    <button onclick="deleteOfficer('${o.id}')" class="ml-auto text-red-400 hover:text-red-600"><i class="fas fa-times"></i></button>
+                </div>
+            `).join('');
+
+            // Render log table
+            const tbody = document.getElementById('officer-log-table');
+            const sortedLogs = [...officerLogs].sort((a, b) => new Date(b.date + 'T' + b.timeIn) - new Date(a.date + 'T' + a.timeIn));
+
+            tbody.innerHTML = sortedLogs.map(log => {
+                const officer = officers.find(o => o.id === log.officerId) || { name: 'Unknown' };
+                const statusClass = !log.timeOut ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
+                const statusText = !log.timeOut ? 'On Duty' : 'Completed';
+
+                return `
+                    <tr class="hover:bg-gray-50 transition-colors border-b border-gray-100">
+                        <td class="p-4 font-medium text-gray-900">${officer.name}</td>
+                        <td class="p-4 text-sm text-gray-600">${officer.role}</td>
+                        <td class="p-4 text-sm">${new Date(log.date).toLocaleDateString()}</td>
+                        <td class="p-4 text-sm font-mono">${log.timeIn}</td>
+                        <td class="p-4 text-sm font-mono">${log.timeOut || '-'}</td>
+                        <td class="p-4 text-sm">${log.duration ? log.duration + 'm' : '-'}</td>
+                        <td class="p-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClass}">
+                                ${statusText}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openOfficerRegistrationModal() {
+            document.getElementById('officer-reg-name').value = '';
+            document.getElementById('officer-reg-license').value = '';
+            document.getElementById('officer-reg-contact').value = '';
+            document.getElementById('officer-registration-modal').classList.remove('hidden');
+        }
+
+        function closeOfficerRegistrationModal() {
+            document.getElementById('officer-registration-modal').classList.add('hidden');
+        }
+
+        function saveOfficerRegistration() {
+            const name = document.getElementById('officer-reg-name').value.trim();
+            const role = document.getElementById('officer-reg-role').value;
+            const license = document.getElementById('officer-reg-license').value.trim();
+            const contact = document.getElementById('officer-reg-contact').value.trim();
+
+            if (!name) {
+                showToast('Please enter officer name', 'error');
+                return;
+            }
+
+            const officerData = {
+                id: `OFF-${Date.now()}`,
+                name,
+                role,
+                license,
+                contact
+            };
+
+            officers.push(officerData);
+            localStorage.setItem('officers', JSON.stringify(officers));
+
+            initOfficerSelect();
+            renderOfficerLog();
+            closeOfficerRegistrationModal();
+            showToast('Officer registered successfully');
+        }
+
+        function deleteOfficer(id) {
+            if (officers.length <= 1) {
+                showToast('Cannot delete the last officer', 'error');
+                return;
+            }
+            if (!confirm('Are you sure you want to remove this officer?')) return;
+
+            officers = officers.filter(o => o.id !== id);
+            localStorage.setItem('officers', JSON.stringify(officers));
+
+            if (currentOfficer === id && officers.length > 0) {
+                currentOfficer = officers[0].id;
+                localStorage.setItem('currentOfficer', currentOfficer);
+            }
+
+            initOfficerSelect();
+            renderOfficerLog();
+            showToast('Officer removed');
+        }
+
+        function openOfficerLogModal() {
+            const select = document.getElementById('duty-officer-select');
+            select.innerHTML = '<option value="">Select Officer</option>' +
+                officers.map(o => `<option value="${o.id}" ${o.id === currentOfficer ? 'selected' : ''}>${o.name}</option>`).join('');
+
+            const now = new Date();
+            document.getElementById('duty-date').value = now.toISOString().split('T')[0];
+            document.getElementById('duty-time-in').value = now.toTimeString().slice(0, 5);
+            document.getElementById('duty-time-out').value = '';
+            document.getElementById('duty-notes').value = '';
+
+            document.getElementById('officer-log-modal').classList.remove('hidden');
+        }
+
+        function closeOfficerLogModal() {
+            document.getElementById('officer-log-modal').classList.add('hidden');
+        }
+
+        function saveOfficerLog() {
+            const officerId = document.getElementById('duty-officer-select').value;
+            const date = document.getElementById('duty-date').value;
+            const timeIn = document.getElementById('duty-time-in').value;
+            const timeOut = document.getElementById('duty-time-out').value;
+            const notes = document.getElementById('duty-notes').value;
+
+            if (!officerId || !date || !timeIn) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+
+            let duration = null;
+            if (timeOut) {
+                const start = new Date(`2000-01-01T${timeIn}`);
+                const end = new Date(`2000-01-01T${timeOut}`);
+                duration = Math.round((end - start) / 60000);
+            }
+
+            const logData = {
+                id: `LOG-${Date.now()}`,
+                officerId,
+                date,
+                timeIn,
+                timeOut: timeOut || null,
+                duration,
+                notes
+            };
+
+            officerLogs.push(logData);
+            localStorage.setItem('officerLogs', JSON.stringify(officerLogs));
+
+            showToast('Duty logged successfully');
+            closeOfficerLogModal();
+            renderOfficerLog();
+            updateOfficer();
+        }
+
+        // Searchable Dropdown Functions
+        function initStudentDropdown() {
+            const list = document.getElementById('student-dropdown-list');
+            const nonMedicalStudents = students.filter(s => !medicalPatients.some(p => p.studentId === s.id));
+
+            list.innerHTML = nonMedicalStudents.map(s => `
+                <li class="searchable-dropdown-item" onclick="selectStudent('${s.id}', '${s.name}')" data-id="${s.id}" data-name="${s.name.toLowerCase()}">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-xs font-bold">
+                            ${s.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                            <p class="font-medium text-sm text-gray-900">${s.name}</p>
+                            <p class="text-xs text-gray-500">${s.id} • ${s.grade} • ${s.strand}</p>
+                        </div>
+                    </div>
+                </li>
+            `).join('');
+
+            if (nonMedicalStudents.length === 0) {
+                list.innerHTML = '<li class="searchable-dropdown-item no-results">No available students found</li>';
+            }
+        }
+
+        function toggleStudentDropdown() {
+            const menu = document.getElementById('student-dropdown-menu');
+            menu.classList.toggle('show');
+            if (menu.classList.contains('show')) {
+                document.getElementById('student-filter-input').focus();
+            }
+        }
+
+        function filterStudentDropdown() {
+            const filter = document.getElementById('student-filter-input').value.toLowerCase();
+            const items = document.querySelectorAll('.searchable-dropdown-item:not(.no-results)');
+
+            items.forEach(item => {
+                const name = item.dataset.name;
+                const id = item.dataset.id.toLowerCase();
+                if (name.includes(filter) || id.includes(filter)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function selectStudent(id, name) {
+            document.getElementById('med-reg-student').value = id;
+            document.getElementById('student-search-input').value = name;
+            document.getElementById('student-dropdown-menu').classList.remove('show');
+            document.getElementById('student-clear-btn').classList.add('show');
+        }
+
+        function clearStudentSelection(e) {
+            e.stopPropagation();
+            document.getElementById('med-reg-student').value = '';
+            document.getElementById('student-search-input').value = '';
+            document.getElementById('student-clear-btn').classList.remove('show');
+        }
+
+        // Details Modals
+        function viewMedicalDetails(patientId) {
+            const patient = medicalPatients.find(p => p.id === patientId);
+            if (!patient) return;
+
+            const student = students.find(s => s.id === patient.studentId) || {};
+            const officer = officers.find(o => o.id === patient.registeredBy) || { name: 'Unknown' };
+
+            const content = document.getElementById('medical-details-content');
+            content.innerHTML = `
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-2xl font-bold">
+                            ${(student.name || patient.name || 'U').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-gray-900">${student.name || patient.name || 'Unknown'}</h4>
+                            <p class="text-sm text-gray-500">${patient.studentId}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase">Gender</p>
+                            <p class="font-medium">${student.gender || patient.gender || 'N/A'}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase">Age</p>
+                            <p class="font-medium">${student.age || patient.age || 'N/A'}</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="text-xs text-gray-500 uppercase mb-2">Medical Conditions</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${patient.conditions.map(c => `<span class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm">${c}</span>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="text-xs text-gray-500 uppercase mb-1">Severity Level</p>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${patient.severity === 'Critical' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}">
+                            ${patient.severity || 'Standard'}
+                        </span>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="text-xs text-gray-500 uppercase mb-1">Medical Notes</p>
+                        <p class="text-sm text-gray-700 bg-white p-3 rounded border border-gray-200">${patient.notes || 'No notes available'}</p>
+                    </div>
+
+                    <div class="text-xs text-gray-400 border-t border-gray-200 pt-3">
+                        <p>Registered by ${officer.name} on ${new Date(patient.registeredDate).toLocaleString()}</p>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <h4 class="text-sm font-bold text-gray-800 mb-3">Recent Visits</h4>
+                    ${medicalVisits.filter(v => v.patientId === patientId).length === 0 ?
+                    '<p class="text-sm text-gray-500 italic">No visit history</p>' :
+                    `<div class="space-y-3">
+                            ${medicalVisits.filter(v => v.patientId === patientId).slice(-3).reverse().map(v => `
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <div>
+                                        <p class="text-sm font-medium">${new Date(v.date).toLocaleDateString()} at ${v.timeIn}</p>
+                                        <p class="text-xs text-gray-500">${v.notes || 'No notes'}</p>
+                                    </div>
+                                    ${v.timeOut ?
+                            `<span class="text-xs text-gray-500">${v.duration}m</span>` :
+                            `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Active</span>`
+                        }
+                                </div>
+                            `).join('')}
+                        </div>`
+                }
+                </div>
+            `;
+
+            document.getElementById('medical-details-modal').classList.remove('hidden');
+        }
+
+        function closeMedicalDetailsModal() {
+            document.getElementById('medical-details-modal').classList.add('hidden');
+        }
+
+        function viewVisitDetails(visitId) {
+            // Could expand this similar to medical details
+            showToast('Visit details view - expand as needed');
+        }
+
+        // Utility Functions
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-message');
+
+            msg.textContent = message;
+            icon.className = type === 'success' ? 'fas fa-check-circle text-emerald-400' : 'fas fa-exclamation-circle text-red-400';
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function saveSettings(e) {
+            e.preventDefault();
+            showToast('Settings saved successfully');
+        }
+
+        function exportVisitLog() {
+            const csvContent = "data:text/csv;charset=utf-8," +
+                "Date,Student,Time In,Time Out,Duration,Officer,Status\n" +
+                medicalVisits.map(v => {
+                    const patient = medicalPatients.find(p => p.id === v.patientId) || {};
+                    const student = students.find(s => s.id === patient.studentId) || { name: patient.name };
+                    const officer = officers.find(o => o.id === v.officerId) || { name: 'Unknown' };
+                    return `${v.date},${student.name},${v.timeIn},${v.timeOut || ''},${v.duration || ''},${officer.name},${v.timeOut ? 'Completed' : 'Active'}`;
+                }).join("\n");
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `clinic_visits_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast('Visit log exported');
+        }
+
+        function renderAll() {
+            renderStudents();
+            renderMedicalPatients();
+            renderVisitLog();
+            renderOfficerLog();
+        }
+    </script>
+</body>
+
+</html>
